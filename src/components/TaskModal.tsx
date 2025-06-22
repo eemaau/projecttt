@@ -122,7 +122,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
     e.preventDefault();
     
     if (!formData.title.trim()) {
-      alert('НАЗВАНИЕ ЗАДАЧИ НЕ МОЖЕТ БЫТЬ ПУСТЫМ');
+      alert('Название задачи не может быть пустым');
       return;
     }
     
@@ -161,7 +161,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
 
   const handleClose = () => {
     if (hasUnsavedChanges) {
-      if (window.confirm('У ВАС ЕСТЬ НЕСОХРАНЕННЫЕ ИЗМЕНЕНИЯ. ВЫ УВЕРЕНЫ, ЧТО ХОТИТЕ ЗАКРЫТЬ?')) {
+      if (window.confirm('У вас есть несохраненные изменения. Вы уверены, что хотите закрыть?')) {
         setHasUnsavedChanges(false);
         onClose();
       }
@@ -185,7 +185,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
   };
 
   const handleDelete = () => {
-    if (task && window.confirm('ВЫ УВЕРЕНЫ, ЧТО ХОТИТЕ УДАЛИТЬ ЭТУ ЗАДАЧУ?')) {
+    if (task && window.confirm('Вы уверены, что хотите удалить эту задачу?')) {
       deleteTask(task.id);
       onClose();
     }
@@ -250,7 +250,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
       setIsRecording(true);
     } catch (error) {
       console.error('Ошибка при запуске записи:', error);
-      alert('НЕ УДАЛОСЬ ПОЛУЧИТЬ ДОСТУП К МИКРОФОНУ');
+      alert('Не удалось получить доступ к микрофону');
     }
   };
 
@@ -389,11 +389,10 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
               <label className="block text-sm font-medium text-gray-700 mb-2 uppercase">
                 НАЗВАНИЕ ЗАДАЧИ
               </label>
-              <input
-                type="text"
+              <textarea
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b6c2fc] focus:border-[#b6c2fc] transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b6c2fc] focus:border-[#b6c2fc] transition-colors resize-y min-h-[60px]"
                 placeholder="ВВЕДИТЕ НАЗВАНИЕ ЗАДАЧИ..."
                 required
               />
@@ -480,7 +479,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={6}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b6c2fc] focus:border-[#b6c2fc] transition-colors resize-y min-h-[120px]"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b6c2fc] focus:border-[#b6c2fc] transition-colors resize-y min-h-[120px] overflow-y-auto"
                 placeholder="ОПИШИТЕ ЗАДАЧУ..."
               />
               
@@ -751,7 +750,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
                   value={formData.deadline}
                   min={getTodayDate()}
                   onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b6c2fc] focus:border-[#b6c2fc] transition-colors"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b6c2fc] focus:border-[#b6c2fc] transition-colors text-right"
                 />
               </div>
             </div>

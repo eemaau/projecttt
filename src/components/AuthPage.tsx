@@ -36,30 +36,33 @@ export function AuthPage() {
   // Валидация пароля
   const validatePassword = (password: string): { isValid: boolean; message: string } => {
     if (password.length < 8 || password.length > 30) {
-      return { isValid: false, message: 'ПАРОЛЬ ДОЛЖЕН СОДЕРЖАТЬ ОТ 8 ДО 30 СИМВОЛОВ' };
+      return { isValid: false, message: 'Пароль должен содержать от 8 до 30 символов' };
     }
     
     if (!/^[a-zA-Z0-9]+$/.test(password)) {
-      return { isValid: false, message: 'ПАРОЛЬ ДОЛЖЕН СОДЕРЖАТЬ ТОЛЬКО АНГЛИЙСКИЕ БУКВЫ И ЦИФРЫ' };
+      return { isValid: false, message: 'Пароль должен содержать только английские буквы и цифры' };
     }
     
     if (!/[a-zA-Z]/.test(password)) {
-      return { isValid: false, message: 'ПАРОЛЬ ДОЛЖЕН СОДЕРЖАТЬ ХОТЯ БЫ ОДНУ БУКВУ' };
+      return { isValid: false, message: 'Пароль должен содержать хотя бы одну букву' };
     }
     
     return { isValid: true, message: '' };
   };
 
   // Валидация email
-  
+  const validateEmail = (email: string): { isValid: boolean; message: string } => {
+    if (email.length < 8 || email.length > 50) {
+      return { isValid: false, message: 'Email должен содержать от 8 до 50 символов' };
+    }
     
     if (!/^[a-zA-Z0-9@.]+$/.test(email)) {
-      return { isValid: false, message: 'EMAIL ДОЛЖЕН СОДЕРЖАТЬ ТОЛЬКО АНГЛИЙСКИЕ БУКВЫ, ЦИФРЫ И СИМВОЛЫ @ .' };
+      return { isValid: false, message: 'Email должен содержать только английские буквы, цифры и символы @ .' };
     }
     
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
-      return { isValid: false, message: 'ВВЕДИТЕ КОРРЕКТНЫЙ EMAIL АДРЕС' };
+      return { isValid: false, message: 'Введите корректный email адрес' };
     }
     
     return { isValid: true, message: '' };
@@ -68,11 +71,11 @@ export function AuthPage() {
   // Валидация имени
   const validateName = (name: string): { isValid: boolean; message: string } => {
     if (name.length < 2) {
-      return { isValid: false, message: 'ИМЯ ДОЛЖНО СОДЕРЖАТЬ МИНИМУМ 2 СИМВОЛА' };
+      return { isValid: false, message: 'Имя должно содержать минимум 2 символа' };
     }
     
     if (!/^[a-zA-Zа-яА-Я]+$/.test(name)) {
-      return { isValid: false, message: 'ИМЯ ДОЛЖНО СОДЕРЖАТЬ ТОЛЬКО БУКВЫ' };
+      return { isValid: false, message: 'Имя должно содержать только буквы' };
     }
     
     return { isValid: true, message: '' };
@@ -81,11 +84,11 @@ export function AuthPage() {
   // Валидация username
   const validateUsername = (username: string): { isValid: boolean; message: string } => {
     if (username.length < 8 || username.length > 30) {
-      return { isValid: false, message: 'ИМЯ ПОЛЬЗОВАТЕЛЯ ДОЛЖНО СОДЕРЖАТЬ ОТ 8 ДО 30 СИМВОЛОВ' };
+      return { isValid: false, message: 'Имя пользователя должно содержать от 8 до 30 символов' };
     }
     
     if (!/^[a-zA-Z0-9]+$/.test(username)) {
-      return { isValid: false, message: 'ИМЯ ПОЛЬЗОВАТЕЛЯ ДОЛЖНО СОДЕРЖАТЬ ТОЛЬКО АНГЛИЙСКИЕ БУКВЫ И ЦИФРЫ' };
+      return { isValid: false, message: 'Имя пользователя должно содержать только английские буквы и цифры' };
     }
     
     return { isValid: true, message: '' };
@@ -115,7 +118,7 @@ export function AuthPage() {
 
         const success = await login(username, password, boardCode);
         if (!success) {
-          setError('НЕВЕРНОЕ ИМЯ ПОЛЬЗОВАТЕЛЯ ИЛИ ПАРОЛЬ');
+          setError('Неверное имя пользователя или пароль');
         }
       } else {
         // Валидация для регистрации
@@ -157,7 +160,7 @@ export function AuthPage() {
         if (patronymic && patronymic.length > 0) {
           const patronymicValidation = validateName(patronymic);
           if (!patronymicValidation.isValid) {
-            setError('ОТЧЕСТВО ' + patronymicValidation.message);
+            setError('Отчество ' + patronymicValidation.message);
             setLoading(false);
             return;
           }

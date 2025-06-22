@@ -41,6 +41,11 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
     markNotificationAsRead(notificationId);
   };
 
+  // Функция для правильного форматирования уведомлений
+  const formatNotificationText = (text: string) => {
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
   return (
     <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -93,15 +98,15 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-medium text-gray-900 uppercase">
-                        {notification.title}
+                      <h4 className="text-sm font-medium text-gray-900">
+                        {formatNotificationText(notification.title)}
                       </h4>
                       {!notification.isRead && (
                         <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0"></div>
                       )}
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
-                      {notification.message}
+                      {formatNotificationText(notification.message)}
                     </p>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-xs text-gray-500">

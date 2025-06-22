@@ -32,6 +32,8 @@ interface AppContextType extends AppState {
   addNotification: (notification: Omit<Notification, 'id' | 'createdAt'>) => void;
   markNotificationAsRead: (notificationId: string) => void;
   markAllNotificationsAsRead: () => void;
+  setLastView: (view: string) => void;
+  getLastView: () => string | null;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -200,6 +202,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentUserId, setCurrentUserId] = useLocalStorage<string | null>('planify-current-user', null);
   const [currentBoardId, setCurrentBoardId] = useLocalStorage<string | null>('planify-current-board', null);
   const [savedCredentials, setSavedCredentials] = useLocalStorage<{ username: string; password: string } | null>('planify-saved-credentials', null);
+  const [lastView, setLastViewStorage] = useLocalStorage<string>('planify-last-view', 'board');
 
   // Генерация уникального кода доски
   const generateBoardCode = (): string => {
@@ -370,6 +373,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  // Функции для сохранения и получения последнего представления
+  const setLastView = (view: string) => {
+    setLastViewStorage(view);
+  };
+
+  const getLastView = () => {
+    return lastView;
+  };
+
   // Генерация ссылки на доску
   const generateBoardLink = (boardId: string): string => {
     const board = state.boards.find(b => b.id === boardId);
@@ -406,8 +418,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addNotification({
         userId: state.currentUser.id,
         type: 'board_added',
-        title: 'ДОБАВЛЕН В ДОСКУ',
-        message: `ВЫ БЫЛИ ДОБАВЛЕНЫ В ДОСКУ "${board.name.toUpperCase()}"`,
+        title: 'Добавлен в доску',
+        message: `Вы были добавлены в доску "${board.name}"`,
         isRead: false,
       });
     }
@@ -554,8 +566,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addNotification({
           userId,
           type: 'task_assigned',
-          title: 'НАЗНАЧЕНА НОВАЯ ЗАДАЧА',
-          message: `ВАМ НАЗНАЧЕНА ЗАДАЧА "${newTask.title.toUpperCase()}"`,
+          title: 'Назначена новая задача',
+          message: `Вам назначена задача "${newTask.title}"`,
           isRead: false,
           relatedId: newTask.id,
         });
@@ -576,8 +588,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addNotification({
           userId,
           type: 'task_completed',
-          title: 'ЗАДАЧА ЗАВЕРШЕНА',
-          message: `ЗАДАЧА "${existingTask.title.toUpperCase()}" БЫЛА ЗАВЕРШЕНА`,
+          title: 'Задача завершена',
+          message: `Задача "${existingTask.title}" была завершена`,
           isRead: false,
           relatedId: taskId,
         });
@@ -592,8 +604,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           addNotification({
             userId,
             type: 'task_assigned',
-            title: 'НАЗНАЧЕНА ЗАДАЧА',
-            message: `ВАМ НАЗНАЧЕНА ЗАДАЧА "${existingTask.title.toUpperCase()}"`,
+            title: 'Назначена задача',
+            message: `Вам назначена задача "${existingTask.title}"`,
             isRead: false,
             relatedId: taskId,
           });
@@ -618,11 +630,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const existingUserByUsername = state.users.find(u => u.username.toLowerCase() === userData.username.toLowerCase());
     
     if (existingUserByEmail) {
-      return { success: false, message: 'ПОЛЬЗОВАТЕЛЬ С ТАКИМ EMAIL УЖЕ СУЩЕСТВУЕТ' };
+      return { success: false, message: 'Пользователь с таким email уже существует' };
     }
     
     if (existingUserByUsername) {
-      return { success: false, message: 'ПОЛЬЗОВАТЕЛЬ С ТАКИМ ИМЕНЕМ ПОЛЬЗОВАТЕЛЯ УЖЕ СУЩЕСТВУЕТ' };
+      return { success: false, message: 'Пользователь с таким именем пользователя уже существует' };
     }
 
     const newUser: User = {
@@ -653,8 +665,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     addNotification({
       userId: newUser.id,
       type: 'board_added',
-      title: 'ДОБАВЛЕН В ДОСКУ',
-      message: `ВЫ БЫЛИ ДОБАВЛЕНЫ В ДОСКУ АДМИНИСТРАТОРОМ`,
+      title: 'Добавлен в доску',
+      message: `Вы были добавлены в доску администратором`,
       isRead: false,
     });
 
@@ -663,13 +675,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addNotification({
         userId: newUser.id,
         type: 'admin_assigned',
-        title: 'НАЗНАЧЕН АДМИНИСТРАТОРОМ',
-        message: `ВАМ НАЗНАЧЕНА РОЛЬ АДМИНИСТРАТОРА`,
+        title: 'Назначен администратором',
+        message: `Вам назначена роль администратора`,
         isRead: false,
       });
     }
     
-    return { success: true, message: 'ПОЛЬЗОВАТЕЛЬ УСПЕШНО СОЗДАН' };
+    return { success: true, message: 'Пользователь успешно создан' };
   };
 
   const updateUser = (userId: string, updates: Partial<User>) => {
@@ -694,8 +706,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addNotification({
         userId,
         type: 'admin_assigned',
-        title: 'НАЗНАЧЕН АДМИНИСТРАТОРОМ',
-        message: `ВАМ НАЗНАЧЕНА РОЛЬ АДМИНИСТРАТОРА`,
+        title: 'Назначен администратором',
+        message: `Вам назначена роль администратора`,
         isRead: false,
       });
     }
@@ -755,7 +767,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       (board.createdBy === state.currentUser?.id && state.boards.length > 1);
     
     if (!canDelete) {
-      alert('ВЫ НЕ МОЖЕТЕ УДАЛИТЬ ЭТУ ДОСКУ');
+      alert('Вы не можете удалить эту доску');
       return;
     }
     
@@ -827,6 +839,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     addNotification,
     markNotificationAsRead,
     markAllNotificationsAsRead,
+    setLastView,
+    getLastView,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

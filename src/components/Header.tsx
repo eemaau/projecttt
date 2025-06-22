@@ -106,7 +106,7 @@ export function Header({ currentView, onViewChange, onCreateTask }: HeaderProps)
     const board = boards.find(b => b.id === boardId);
     if (!board) return;
     
-    if (window.confirm(`ВЫ УВЕРЕНЫ, ЧТО ХОТИТЕ УДАЛИТЬ ДОСКУ "${board.name.toUpperCase()}"?`)) {
+    if (window.confirm(`Вы уверены, что хотите удалить доску "${board.name}"?`)) {
       deleteBoard(boardId);
     }
   };
@@ -115,9 +115,9 @@ export function Header({ currentView, onViewChange, onCreateTask }: HeaderProps)
     e.stopPropagation();
     const link = generateBoardLink(boardId);
     navigator.clipboard.writeText(link).then(() => {
-      alert('ССЫЛКА НА ДОСКУ СКОПИРОВАНА В БУФЕР ОБМЕНА');
+      alert('Ссылка на доску скопирована в буфер обмена');
     }).catch(() => {
-      prompt('СКОПИРУЙТЕ ССЫЛКУ НА ДОСКУ:', link);
+      prompt('Скопируйте ссылку на доску:', link);
     });
   };
 

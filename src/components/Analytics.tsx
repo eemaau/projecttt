@@ -89,9 +89,9 @@ export function Analytics() {
 
   // Цвета приоритетов для графиков
   const priorityColors = {
-    high: '#FFB3BA',
-    medium: '#FFDFBA', 
-    low: '#BAFFC9',
+    high: '#FFE1E7',
+    medium: '#FCFCE9', 
+    low: '#DFFAD7',
   };
 
   const StatCard = ({ icon: Icon, title, value, subtitle, color }: {
@@ -118,7 +118,7 @@ export function Analytics() {
   return (
     <div className="p-4 md:p-6 h-full overflow-y-auto">
       <div className="flex items-center space-x-3 mb-6">
-        <BarChart3 className="w-5 h-5 md:w-6 md:h-6" style={{ color: '#FFB3BA' }} />
+        <BarChart3 className="w-5 h-5 md:w-6 md:h-6" style={{ color: '#a4d2fc' }} />
         <h2 className="text-lg md:text-2xl font-bold text-gray-900 uppercase">АНАЛИТИКА ЗАДАЧ</h2>
       </div>
 
@@ -158,7 +158,7 @@ export function Analytics() {
         {/* Распределение по статусам */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
           <h3 className="text-md md:text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <PieChart className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#FFDFBA' }} />
+            <PieChart className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#a4d2fc' }} />
             <span className="uppercase">РАСПРЕДЕЛЕНИЕ ПО СТАТУСАМ</span>
           </h3>
           <div className="space-y-3 md:space-y-4">
@@ -219,7 +219,7 @@ export function Analytics() {
         {/* Месячная статистика с визуальным представлением */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
           <h3 className="text-md md:text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <BarChart3 className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#BAFFC9' }} />
+            <BarChart3 className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#a4d2fc' }} />
             <span className="uppercase">СТАТИСТИКА ПО МЕСЯЦАМ</span>
           </h3>
           
@@ -252,39 +252,13 @@ export function Analytics() {
               );
             })}
           </div>
-          
-          {/* Таблица для детальной информации */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs md:text-sm">
-              <thead>
-                <tr className="border-b border-gray-200" style={{ backgroundColor: '#a4d2fc' }}>
-                  <th className="text-left py-2 font-medium text-gray-700 uppercase">МЕСЯЦ</th>
-                  <th className="text-center py-2 font-medium text-gray-700 uppercase">ВСЕГО</th>
-                  <th className="text-center py-2 font-medium text-gray-700 uppercase">ВЫПОЛНЕНО</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {monthlyStats.map((stat, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="py-2 text-gray-900 uppercase">{stat.month}</td>
-                    <td className="text-center py-2 text-gray-900 font-medium">{stat.total}</td>
-                    <td className="text-center py-2">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                        {stat.completed}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
 
       {/* Производительность пользователей */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mb-6 md:mb-8">
         <h3 className="text-md md:text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-          <Users className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#E6E6FA' }} />
+          <Users className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#a4d2fc' }} />
           <span className="uppercase">ПРОИЗВОДИТЕЛЬНОСТЬ ПОЛЬЗОВАТЕЛЕЙ</span>
         </h3>
         
@@ -402,7 +376,7 @@ export function Analytics() {
       {/* Недавняя активность */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
         <h3 className="text-md md:text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-          <Calendar className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#DDA0DD' }} />
+          <Calendar className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#a4d2fc' }} />
           <span className="uppercase">НЕДАВНЯЯ АКТИВНОСТЬ</span>
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

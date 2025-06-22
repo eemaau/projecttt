@@ -22,7 +22,6 @@ export function UserManagement() {
     firstName: '',
     lastName: '',
     patronymic: '',
-    password: '',
     role: 'user' as 'admin' | 'user',
   });
   const [error, setError] = useState('');
@@ -50,10 +49,6 @@ export function UserManagement() {
     return username.length >= 8 && username.length <= 30 && /^[a-zA-Z0-9]+$/.test(username);
   };
 
-  const validatePassword = (password: string): boolean => {
-    return password.length >= 8 && password.length <= 30 && /^[a-zA-Z0-9]+$/.test(password) && /[a-zA-Z]/.test(password);
-  };
-
   const validateName = (name: string): boolean => {
     return name.length >= 2 && /^[a-zA-Zа-яА-Я]+$/.test(name);
   };
@@ -63,32 +58,27 @@ export function UserManagement() {
     setError('');
     
     if (!validateEmail(formData.email)) {
-      setError('ПОЖАЛУЙСТА, ВВЕДИТЕ КОРРЕКТНЫЙ EMAIL АДРЕС');
+      setError('Пожалуйста, введите корректный email адрес');
       return;
     }
 
     if (!validateUsername(formData.username)) {
-      setError('ИМЯ ПОЛЬЗОВАТЕЛЯ ДОЛЖНО СОДЕРЖАТЬ ОТ 8 ДО 30 СИМВОЛОВ И ТОЛЬКО АНГЛИЙСКИЕ БУКВЫ И ЦИФРЫ');
-      return;
-    }
-
-    if (!validatePassword(formData.password)) {
-      setError('ПАРОЛЬ ДОЛЖЕН СОДЕРЖАТЬ ОТ 8 ДО 30 СИМВОЛОВ, ТОЛЬКО АНГЛИЙСКИЕ БУКВЫ И ЦИФРЫ, И ХОТЯ БЫ ОДНУ БУКВУ');
+      setError('Имя пользователя должно содержать от 8 до 30 символов и только английские буквы и цифры');
       return;
     }
 
     if (!validateName(formData.firstName)) {
-      setError('ИМЯ ДОЛЖНО СОДЕРЖАТЬ МИНИМУМ 2 СИМВОЛА И ТОЛЬКО БУКВЫ');
+      setError('Имя должно содержать минимум 2 символа и только буквы');
       return;
     }
 
     if (!validateName(formData.lastName)) {
-      setError('ФАМИЛИЯ ДОЛЖНА СОДЕРЖАТЬ МИНИМУМ 2 СИМВОЛА И ТОЛЬКО БУКВЫ');
+      setError('Фамилия должна содержать минимум 2 символа и только буквы');
       return;
     }
 
     if (formData.patronymic && !validateName(formData.patronymic)) {
-      setError('ОТЧЕСТВО ДОЛЖНО СОДЕРЖАТЬ ТОЛЬКО БУКВЫ');
+      setError('Отчество должно содержать только буквы');
       return;
     }
     
@@ -98,28 +88,30 @@ export function UserManagement() {
       const existingUserByUsername = users.find(u => u.username.toLowerCase() === formData.username.toLowerCase() && u.id !== editingUser.id);
       
       if (existingUserByEmail) {
-        setError('ПОЛЬЗОВАТЕЛЬ С ТАКИМ EMAIL УЖЕ СУЩЕСТВУЕТ');
+        setError('Пользователь с таким email уже существует');
         return;
       }
       
       if (existingUserByUsername) {
-        setError('ПОЛЬЗОВАТЕЛЬ С ТАКИМ ИМЕНЕМ ПОЛЬЗОВАТЕЛЯ УЖЕ СУЩЕСТВУЕТ');
+        setError('Пользователь с таким именем пользователя уже существует');
         return;
       }
       
-      updateUser(editingUser.id, formData);
+      updateUser(editingUser.id, { ...formData, password: editingUser.password });
       setEditingUser(null);
       setShowAddUser(false);
     } else {
-      const result = await addUser(formData);
+      // Генерируем временный пароль для нового пользователя
+      const tempPassword = 'password123';
+      const result = await addUser({ ...formData, password: tempPassword });
       if (!result.success) {
-        setError(result.message.toUpperCase());
+        setError(result.message);
         return;
       }
       setShowAddUser(false);
     }
     
-    setFormData({ username: '', email: '', firstName: '', lastName: '', patronymic: '', password: '', role: 'user' });
+    setFormData({ username: '', email: '', firstName: '', lastName: '', patronymic: '', role: 'user' });
   };
 
   const handleEdit = (user: User) => {
@@ -130,7 +122,6 @@ export function UserManagement() {
       firstName: user.firstName,
       lastName: user.lastName,
       patronymic: user.patronymic || '',
-      password: user.password,
       role: user.role,
     });
     setShowAddUser(true);
@@ -139,11 +130,11 @@ export function UserManagement() {
 
   const handleDelete = (user: User) => {
     if (user.id === currentUser?.id) {
-      alert('ВЫ НЕ МОЖЕТЕ УДАЛИТЬ СВОЙ СОБСТВЕННЫЙ АККАУНТ.');
+      alert('Вы не можете удалить свой собственный аккаунт.');
       return;
     }
     
-    if (window.confirm(`ВЫ УВЕРЕНЫ, ЧТО ХОТИТЕ УДАЛИТЬ ${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}?`)) {
+    if (window.confirm(`Вы уверены, что хотите удалить ${user.firstName} ${user.lastName}?`)) {
       deleteUser(user.id);
     }
   };
@@ -160,9 +151,13 @@ export function UserManagement() {
   const cancelEdit = () => {
     setShowAddUser(false);
     setEditingUser(null);
-    setFormData({ username: '', email: '', firstName: '', lastName: '', patronymic: '', password: '', role: 'user' });
+    setFormData({ username: '', email: '', firstName: '', lastName: '', patronymic: '', role: 'user' });
     setError('');
   };
+
+  // Общая статистика
+  const totalTasks = tasks.length;
+  const totalCompleted = tasks.filter(task => task.status === 'completed').length;
 
   // Мобильная версия - список пользователей
   if (isMobile) {
@@ -174,18 +169,34 @@ export function UserManagement() {
             <h2 className="text-lg font-bold text-gray-900 uppercase">ПОЛЬЗОВАТЕЛИ</h2>
           </div>
           
-          <button
-            onClick={() => setShowAddUser(true)}
-            className="flex items-center space-x-1 text-gray-800 px-3 py-2 rounded-xl font-medium uppercase text-sm"
-            style={{ backgroundColor: '#CFE8FF' }}
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>ДОБАВИТЬ</span>
-          </button>
+          {currentUser?.role === 'admin' && (
+            <button
+              onClick={() => setShowAddUser(true)}
+              className="flex items-center space-x-1 text-gray-800 px-3 py-2 rounded-xl font-medium uppercase text-sm"
+              style={{ backgroundColor: '#CFE8FF' }}
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>ДОБАВИТЬ</span>
+            </button>
+          )}
+        </div>
+
+        {/* Общая статистика */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+          <div className="grid grid-cols-2 gap-4 text-center">
+            <div>
+              <div className="text-xl font-bold text-blue-600">{totalTasks}</div>
+              <div className="text-xs text-gray-500 uppercase">ВСЕГО ЗАДАЧ</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-green-600">{totalCompleted}</div>
+              <div className="text-xs text-gray-500 uppercase">ВЫПОЛНЕНО</div>
+            </div>
+          </div>
         </div>
 
         {/* Форма добавления/редактирования пользователя */}
-        {showAddUser && (
+        {showAddUser && currentUser?.role === 'admin' && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
             <h3 className="text-md font-semibold text-gray-900 mb-4 uppercase">
               {editingUser ? 'РЕДАКТИРОВАТЬ' : 'ДОБАВИТЬ ПОЛЬЗОВАТЕЛЯ'}
@@ -271,20 +282,6 @@ export function UserManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 uppercase">
-                  ПАРОЛЬ
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#CFE8FF] focus:border-[#CFE8FF] transition-colors"
-                  placeholder="ВВЕДИТЕ ПАРОЛЬ"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 uppercase">
                   РОЛЬ
                 </label>
                 <select
@@ -327,8 +324,18 @@ export function UserManagement() {
               <div key={user.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3 flex-1">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center text-white font-medium">
-                      {user.firstName.charAt(0).toUpperCase()}
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium overflow-hidden">
+                      {user.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center">
+                          {user.firstName.charAt(0).toUpperCase()}
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="font-medium text-gray-900 flex items-center space-x-2">
@@ -361,22 +368,24 @@ export function UserManagement() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleEdit(user)}
-                      className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    {!isCurrentUser && (
+                  {currentUser?.role === 'admin' && (
+                    <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => handleDelete(user)}
-                        className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        onClick={() => handleEdit(user)}
+                        className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Edit className="w-4 h-4" />
                       </button>
-                    )}
-                  </div>
+                      {!isCurrentUser && (
+                        <button
+                          onClick={() => handleDelete(user)}
+                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -398,18 +407,31 @@ export function UserManagement() {
           </span>
         </div>
         
-        <button
-          onClick={() => setShowAddUser(true)}
-          className="flex items-center space-x-2 text-gray-800 px-4 py-2 rounded-xl font-medium uppercase"
-          style={{ backgroundColor: '#CFE8FF' }}
-        >
-          <UserPlus className="w-5 h-5" />
-          <span>ДОБАВИТЬ ПОЛЬЗОВАТЕЛЯ</span>
-        </button>
+        {/* Общая статистика */}
+        <div className="flex items-center space-x-4">
+          <div className="text-center">
+            <div className="text-lg font-bold text-blue-600">{totalTasks}</div>
+            <div className="text-xs text-gray-500 uppercase">ВСЕГО ЗАДАЧ</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-green-600">{totalCompleted}</div>
+            <div className="text-xs text-gray-500 uppercase">ВЫПОЛНЕНО</div>
+          </div>
+          {currentUser?.role === 'admin' && (
+            <button
+              onClick={() => setShowAddUser(true)}
+              className="flex items-center space-x-2 text-gray-800 px-4 py-2 rounded-xl font-medium uppercase"
+              style={{ backgroundColor: '#CFE8FF' }}
+            >
+              <UserPlus className="w-5 h-5" />
+              <span>ДОБАВИТЬ ПОЛЬЗОВАТЕЛЯ</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Форма добавления/редактирования пользователя */}
-      {showAddUser && (
+      {showAddUser && currentUser?.role === 'admin' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 uppercase">
             {editingUser ? 'РЕДАКТИРОВАТЬ ПОЛЬЗОВАТЕЛЯ' : 'ДОБАВИТЬ НОВОГО ПОЛЬЗОВАТЕЛЯ'}
@@ -455,6 +477,7 @@ export function UserManagement() {
               <label className="block text-sm font-medium text-gray-700 mb-2 uppercase">
                 ИМЯ
               </label>
+              
               <input
                 type="text"
                 value={formData.firstName}
@@ -489,20 +512,6 @@ export function UserManagement() {
                 onChange={(e) => setFormData({ ...formData, patronymic: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#CFE8FF] focus:border-[#CFE8FF] transition-colors"
                 placeholder="ВВЕДИТЕ ОТЧЕСТВО"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2 uppercase">
-                ПАРОЛЬ
-              </label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#CFE8FF] focus:border-[#CFE8FF] transition-colors"
-                placeholder="ВВЕДИТЕ ПАРОЛЬ"
-                required
               />
             </div>
 
@@ -552,7 +561,9 @@ export function UserManagement() {
                 <th className="text-left py-4 px-6 font-medium text-gray-700 uppercase">В ПРОЦЕССЕ</th>
                 <th className="text-left py-4 px-6 font-medium text-gray-700 uppercase">СОЗДАНО</th>
                 <th className="text-left py-4 px-6 font-medium text-gray-700 uppercase">ЭФФЕКТИВНОСТЬ</th>
-                <th className="text-right py-4 px-6 font-medium text-gray-700 uppercase">ДЕЙСТВИЯ</th>
+                {currentUser?.role === 'admin' && (
+                  <th className="text-right py-4 px-6 font-medium text-gray-700 uppercase">ДЕЙСТВИЯ</th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -565,8 +576,18 @@ export function UserManagement() {
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center text-white font-medium">
-                          {user.firstName.charAt(0).toUpperCase()}
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium overflow-hidden">
+                          {user.avatar ? (
+                            <img
+                              src={user.avatar}
+                              alt="Avatar"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center">
+                              {user.firstName.charAt(0).toUpperCase()}
+                            </div>
+                          )}
                         </div>
                         <div>
                           <div className="font-medium text-gray-900 flex items-center space-x-2">
@@ -625,24 +646,26 @@ export function UserManagement() {
                         <span className="text-sm font-medium text-gray-900">{efficiency}%</span>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button
-                          onClick={() => handleEdit(user)}
-                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        {!isCurrentUser && (
+                    {currentUser?.role === 'admin' && (
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end space-x-2">
                           <button
-                            onClick={() => handleDelete(user)}
-                            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            onClick={() => handleEdit(user)}
+                            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Edit className="w-4 h-4" />
                           </button>
-                        )}
-                      </div>
-                    </td>
+                          {!isCurrentUser && (
+                            <button
+                              onClick={() => handleDelete(user)}
+                              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
