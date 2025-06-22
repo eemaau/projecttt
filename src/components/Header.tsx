@@ -167,7 +167,11 @@ export function Header({ currentView, onViewChange, onCreateTask }: HeaderProps)
             >
               <Folder className="w-3 h-3 md:w-4 md:h-4 text-gray-600 flex-shrink-0" />
               <span className="font-medium text-gray-900 uppercase truncate text-sm md:text-base">
-                {currentBoard?.name || 'ВЫБЕРИТЕ ДОСКУ'}
+                {currentBoard?.name ? (
+                  isMobile && currentBoard.name.length > 12 
+                    ? currentBoard.name.substring(0, 12) + '...'
+                    : currentBoard.name
+                ) : 'ВЫБЕРИТЕ ДОСКУ'}
               </span>
               <ChevronDown className="w-3 h-3 md:w-4 md:h-4 text-gray-600 flex-shrink-0" />
             </button>

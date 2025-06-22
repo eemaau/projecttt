@@ -330,7 +330,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
     return new Date().toISOString().split('T')[0];
   };
 
-  // Функция для отображения форматированного текста без кода
+  // Функция для отображения форматированного текста
   const renderFormattedText = (text: string) => {
     if (!text) return '';
     
@@ -506,7 +506,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors text-white"
                     style={{ backgroundColor: '#a4d2fc' }}
                   >
                     <Upload className="w-4 h-4" />
@@ -519,7 +519,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
                     className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors ${
                       isRecording 
                         ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                        : 'hover:opacity-80'
+                        : 'text-white hover:opacity-80'
                     }`}
                     style={!isRecording ? { backgroundColor: '#a4d2fc' } : {}}
                   >
@@ -721,9 +721,22 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
                         onChange={(e) => handleAssigneeChange(user.id, e.target.checked)}
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
-                      <span className="text-sm text-gray-700 uppercase">
-                        {user.firstName} {user.lastName} ({user.role.toUpperCase()})
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt="Avatar"
+                            className="w-5 h-5 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-5 h-5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                            {user.firstName.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <span className="text-sm text-gray-700 uppercase">
+                          {user.firstName} {user.lastName} ({user.role.toUpperCase()})
+                        </span>
+                      </div>
                     </label>
                   ))}
                 </div>
@@ -794,7 +807,7 @@ export function TaskModal({ task, isOpen, onClose, defaultStatus = 'created' }: 
                   <button
                     type="button"
                     onClick={handleAddComment}
-                    className="px-4 py-2 text-gray-700 rounded-xl transition-colors text-sm font-medium uppercase"
+                    className="px-4 py-2 text-white rounded-xl transition-colors text-sm font-medium uppercase"
                     style={{ backgroundColor: '#b6c2fc' }}
                   >
                     ДОБАВИТЬ
