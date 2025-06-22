@@ -51,10 +51,7 @@ export function AuthPage() {
   };
 
   // Валидация email
-  const validateEmail = (email: string): { isValid: boolean; message: string } => {
-    if (email.length < 8 || email.length > 50) {
-      return { isValid: false, message: 'EMAIL ДОЛЖЕН СОДЕРЖАТЬ ОТ 8 ДО 50 СИМВОЛОВ' };
-    }
+  
     
     if (!/^[a-zA-Z0-9@.]+$/.test(email)) {
       return { isValid: false, message: 'EMAIL ДОЛЖЕН СОДЕРЖАТЬ ТОЛЬКО АНГЛИЙСКИЕ БУКВЫ, ЦИФРЫ И СИМВОЛЫ @ .' };
@@ -176,11 +173,11 @@ export function AuthPage() {
         }, boardCode);
         
         if (!success) {
-          setError('ПОЛЬЗОВАТЕЛЬ С ТАКИМ ИМЕНЕМ ИЛИ EMAIL УЖЕ СУЩЕСТВУЕТ');
+          setError('Пользователь с таким именем или email уже существует');
         }
       }
     } catch (err) {
-      setError('ПРОИЗОШЛА ОШИБКА. ПОПРОБУЙТЕ СНОВА.');
+      setError('Произошла ошибка. Попробуйте снова');
     } finally {
       setLoading(false);
     }
@@ -194,7 +191,7 @@ export function AuthPage() {
   };
 
   const handleClearSavedData = () => {
-    if (window.confirm('ВЫ УВЕРЕНЫ, ЧТО ХОТИТЕ УДАЛИТЬ СОХРАНЕННЫЕ ДАННЫЕ ДЛЯ АВТОЗАПОЛНЕНИЯ?')) {
+    if (window.confirm('Вы уверены, что хотите удалить сохраненные данные для автозаполнения?')) {
       clearSavedCredentials();
       setUsername('');
       setPassword('');
